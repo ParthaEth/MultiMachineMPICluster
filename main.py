@@ -5,6 +5,8 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 
 from training import train_loop
+import socket
+import time
 
 
 # On Windows platform, the torch.distributed package only
@@ -34,25 +36,45 @@ def setup(rank, world_size):
 def cleanup():
     dist.destroy_process_group()
 
-def demo_basic(local_rank, node_rank, gpus_per_node, world_size):
+def setup_and_run_single_process_train_code(local_rank, node_rank, gpus_per_node, world_size):
     print(f'Running basic DDP example on machine: {node_rank} in gpu: {local_rank}.')
     global_rnak = gpus_per_node * node_rank + local_rank
     setup(global_rnak, world_size)
     print(f'Starting training loop')
     try:
-        train_loop.run_training_loop(local_rank=local_rank)
+        train_loop.run_training_loop(local_rank=local_rank, global_rnak=global_rnak)
     finally:
         cleanup()
 
-def run_demo(demo_fn, gpus_per_node, node_rank, world_size):
-    mp.spawn(demo_fn, args=(node_rank, gpus_per_node, world_size,), nprocs=gpus_per_node, join=True)
+def spawn_processes_for_this_node(setup_and_run_single_process_train_code, gpus_per_node, node_rank, world_size):
+    mp.spawn(setup_and_run_single_process_train_code, args=(node_rank, gpus_per_node, world_size,),
+             nprocs=gpus_per_node, join=True)
+
+def manage_master_node_addr_and_port(node_rank, out_dir):
+    if os.getenv('MASTER_ADDR') is None:
+        info_file = os.path.join(out_dir, 'master_addr.txt')
+        if node_rank == 0:
+            hostname = socket.gethostname()
+            ipaddr = socket.gethostbyname(hostname)
+            with open(info_file, 'w') as f:
+                f.write(ipaddr)
+        else:
+            while not os.path.exists(info_file):
+                time.sleep(30)  # wait 30 seconds and check if the muster process has started
+            with open(info_file) as f:
+                ipaddr = f.readlines()[0]
+
+        os.environ['MASTER_ADDR'] = ipaddr
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu_per_node', type=int, default=1)
-    parser.add_argument('--nodes', type=int, default=1)
-    parser.add_argument('--node_rank', type=int, default=0)
+    parser.add_argument('-gpn', '--gpu_per_node', type=int, default=1)
+    parser.add_argument('-n', '--nodes', type=int, default=1)
+    parser.add_argument('-nr', '--node_rank', type=int, default=0)
+    parser.add_argument('-od', '--output_dir', type=str, default=None)
     args = parser.parse_args()
+    manage_master_node_addr_and_port(args.node_rank, args.output_dir)
     world_size = args.gpu_per_node * args.nodes
-    run_demo(demo_basic, args.gpu_per_node, args.node_rank, world_size)
+    spawn_processes_for_this_node(setup_and_run_single_process_train_code, args.gpu_per_node, args.node_rank,
+                                  world_size)
