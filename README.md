@@ -2,7 +2,7 @@
 
 ## Goal
 
-The primary goal of this repository is to enable users to run neural network training over multiple machines. As a starter, look up PyTorch native multi-machine support here - [https://pytorch.org/tutorials/intermediate/ddp_series_multinode.html](https://pytorch.org/tutorials/intermediate/ddp_series_multinode.html).
+The primary goal of this repository is to enable users to run neural network training over multiple machines. As a starter, look up PyTorch native multi-machine support [here](https://pytorch.org/tutorials/intermediate/ddp_series_multinode.html).
 
 ### Additional goals
 
