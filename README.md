@@ -14,3 +14,4 @@ If you are using this repo you are encouraged to contribute to it aswell.
 
 ## Usage
 Clone the repo as base repository then specialize according to your specific needs feel free to edit and modify as you like. If you implement a generic feature that you think everyone can also use make a PR.
+Even if you are using **single machine** and multiple GPUs. Switching to this repo will **speed up your training** as compared to `torch.nn.DataParallel`.
