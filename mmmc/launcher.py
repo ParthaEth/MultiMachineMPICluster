@@ -27,6 +27,7 @@ def setup(rank, world_size):
     if os.getenv('MASTER_PORT') is None:
         os.environ['MASTER_PORT'] = '3630'
 
+    os.system(f'fuser -n tcp -k {os.getenv("MASTER_PORT")}')
     # initialize the process group
     dist.init_process_group('nccl', rank=rank, world_size=world_size)
 
@@ -36,11 +37,11 @@ def cleanup():
 def setup_and_run_single_process_train_code(local_rank, node_rank, gpus_per_node, world_size, train_loop,
                                             train_loop_kwargs):
     print(f'Running basic DDP example on machine: {node_rank} in gpu: {local_rank}.')
-    global_rnak = gpus_per_node * node_rank + local_rank
-    setup(global_rnak, world_size)
+    global_rank = gpus_per_node * node_rank + local_rank
+    setup(global_rank, world_size)
     print(f'Starting training loop')
     try:
-        train_loop(local_rank=local_rank, global_rnak=global_rnak, **train_loop_kwargs)
+        train_loop(local_rank=local_rank, global_rank=global_rank, **train_loop_kwargs)
     finally:
         cleanup()
 

@@ -4,11 +4,11 @@ import torch.optim as optim
 
 from examples.model.toy_model import ToyModel
 
-def run_training_loop(local_rank, global_rnak, **kwargs):
+def run_training_loop(local_rank, global_rank, **kwargs):
     # create model and move it to GPU with id rank
     # print(kwargs)
     model = ToyModel().to(local_rank)
-    ddp_model = DDP(model)
+    ddp_model = DDP(model, device_ids=[local_rank])
 
     loss_fn = torch.nn.MSELoss()
     optimizer = optim.SGD(ddp_model.parameters(), lr=0.001)
@@ -21,5 +21,5 @@ def run_training_loop(local_rank, global_rnak, **kwargs):
         loss = loss_fn(outputs, labels)
         loss.backward()
         optimizer.step()
-        if global_rnak == 0: # Things that should happen only once such as checkpointing
+        if global_rank == 0: # Things that should happen only once such as checkpointing
             print(f'itr:{itr_num}/{total_iterations}. loss: {loss.mean().item()}')

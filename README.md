@@ -25,3 +25,7 @@ Even if you are using **single machine** and multiple GPUs. Switching to this re
 
 To run this program you can use the following command
 `./condor_submit_script.sh --bid=100 --num_cpus_per_node=2 --num_gpus_per_node=1 --cpu_ram_MB=64000 --cuda_device_name='NVIDIA A100-SXM4-80GB' --python_interp_path=<Full_path_to_python_executable_in_venv_or_conda> --nodes=2 --output_dir=<out_dir> --path_top_py_scpt=./examples/main.py`
+
+## Known problems and fixes
+1. To get way more info on what NCCL is doing set the following env. vars `NCCL_DEBUG=INFO NCCL_DEBUG_SUBSYS=ALL`
+2. `NCCL WARN Call to ibv_create_cq failed with error Cannot allocate memory` - It is likely that `ulimit -l` is set too low
