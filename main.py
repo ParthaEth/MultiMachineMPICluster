@@ -36,18 +36,19 @@ def setup(rank, world_size):
 def cleanup():
     dist.destroy_process_group()
 
-def setup_and_run_single_process_train_code(local_rank, node_rank, gpus_per_node, world_size):
+def setup_and_run_single_process_train_code(local_rank, node_rank, gpus_per_node, world_size, train_loop_kwargs):
     print(f'Running basic DDP example on machine: {node_rank} in gpu: {local_rank}.')
     global_rnak = gpus_per_node * node_rank + local_rank
     setup(global_rnak, world_size)
     print(f'Starting training loop')
     try:
-        train_loop.run_training_loop(local_rank=local_rank, global_rnak=global_rnak)
+        train_loop.run_training_loop(local_rank=local_rank, global_rnak=global_rnak, **train_loop_kwargs)
     finally:
         cleanup()
 
-def spawn_processes_for_this_node(setup_and_run_single_process_train_code, gpus_per_node, node_rank, world_size):
-    mp.spawn(setup_and_run_single_process_train_code, args=(node_rank, gpus_per_node, world_size,),
+def spawn_processes_for_this_node(setup_and_run_single_process_train_code, gpus_per_node, node_rank, world_size,
+                                  **train_loop_kwargs):
+    mp.spawn(setup_and_run_single_process_train_code, args=(node_rank, gpus_per_node, world_size, train_loop_kwargs),
              nprocs=gpus_per_node, join=True)
 
 def manage_master_node_addr_and_port(node_rank, out_dir, unique_id):
@@ -78,4 +79,4 @@ if __name__ == '__main__':
     manage_master_node_addr_and_port(args.node_rank, args.output_dir, unique_id=args.unique_id)
     world_size = args.gpu_per_node * args.nodes
     spawn_processes_for_this_node(setup_and_run_single_process_train_code, args.gpu_per_node, args.node_rank,
-                                  world_size)
+                                  world_size, out_dir=args.output_dir)

@@ -1,2 +1,5 @@
 .idea/
-
+*_master_addr.txt
+model/__pycache__/
+training/__pycache__/
+*__pycache__/
