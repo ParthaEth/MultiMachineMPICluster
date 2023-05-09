@@ -50,9 +50,9 @@ def spawn_processes_for_this_node(setup_and_run_single_process_train_code, gpus_
     mp.spawn(setup_and_run_single_process_train_code, args=(node_rank, gpus_per_node, world_size,),
              nprocs=gpus_per_node, join=True)
 
-def manage_master_node_addr_and_port(node_rank, out_dir):
+def manage_master_node_addr_and_port(node_rank, out_dir, unique_id):
     if os.getenv('MASTER_ADDR') is None:
-        info_file = os.path.join(out_dir, 'master_addr.txt')
+        info_file = os.path.join(out_dir, f'{unique_id}_master_addr.txt')
         if node_rank == 0:
             hostname = socket.gethostname()
             ipaddr = socket.gethostbyname(hostname)
@@ -73,8 +73,9 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--nodes', type=int, default=1)
     parser.add_argument('-nr', '--node_rank', type=int, default=0)
     parser.add_argument('-od', '--output_dir', type=str, default=None)
+    parser.add_argument('-uid', '--unique_id', type=str, default=None)
     args = parser.parse_args()
-    manage_master_node_addr_and_port(args.node_rank, args.output_dir)
+    manage_master_node_addr_and_port(args.node_rank, args.output_dir, unique_id=args.unique_id)
     world_size = args.gpu_per_node * args.nodes
     spawn_processes_for_this_node(setup_and_run_single_process_train_code, args.gpu_per_node, args.node_rank,
                                   world_size)
