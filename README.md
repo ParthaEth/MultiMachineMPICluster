@@ -24,4 +24,4 @@ Clone the repository and then make modifications to fit your specific needs; fee
 Even if you are using **single machine** and multiple GPUs. Switching to this repo will **speed up your training** as compared to `torch.nn.DataParallel`.
 
 To run this program you can use the following command
-`./condor_submit_script.sh --bid=100 --num_cpus_per_node=2 --num_gpus_per_node=1 --cpu_ram_MB=64000 --cuda_device_name='NVIDIA A100-SXM4-80GB' --python_interp_path=<Full_path_to_python_executable_in_venv_or_conda> --nodes=2 --output_dir=<out_dir>`
+`./condor_submit_script.sh --bid=100 --num_cpus_per_node=2 --num_gpus_per_node=1 --cpu_ram_MB=64000 --cuda_device_name='NVIDIA A100-SXM4-80GB' --python_interp_path=<Full_path_to_python_executable_in_venv_or_conda> --nodes=2 --output_dir=<out_dir> --path_top_py_scpt=./examples/main.py`
