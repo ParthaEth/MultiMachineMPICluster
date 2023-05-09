@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(sys.path.append(os.getcwd()))
 import argparse
-import launcher
+from mmmc import launcher
 from examples.training import train_loop
 
 if __name__ == '__main__':
