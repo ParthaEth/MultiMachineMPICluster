@@ -37,8 +37,6 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-for (( node_rank=0; node_rank<$nodes; node_rank++ ))
-do
-  command="condor_submit_bid $bid <(printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' 'error=$output_dir/\$(Process).\$(Cluster).err' 'output=$output_dir/\$(Process).\$(Cluster).out' 'log=$output_dir/\$(Process).\$(Cluster).log' 'request_cpus=$num_cpus_per_node' 'request_gpus=$num_gpus_per_node' 'request_memory=$cpu_ram_MB' 'requirements=CUDADeviceName==\"$cuda_device_name\"' 'executable=$python_interp_path' 'arguments=main.py --gpu_per_node $num_gpus_per_node --nodes $nodes --node_rank $node_rank --output_dir $output_dir' 'queue')"
-  eval "$command"
-done
+command="condor_submit_bid $bid <(printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' 'error=$output_dir/\$(Process).\$(Cluster).err' 'output=$output_dir/\$(Process).\$(Cluster).out' 'log=$output_dir/\$(Process).\$(Cluster).log' 'request_cpus=$num_cpus_per_node' 'request_gpus=$num_gpus_per_node' 'request_memory=$cpu_ram_MB' 'requirements=CUDADeviceName==\"$cuda_device_name\"' 'executable=$python_interp_path' 'arguments=main.py --gpu_per_node $num_gpus_per_node --nodes $nodes --node_rank \$(Process) --output_dir $output_dir' 'queue $nodes')"
+eval "$command"
+
