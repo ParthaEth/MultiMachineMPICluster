@@ -27,7 +27,6 @@ def setup(rank, world_size):
     if os.getenv('MASTER_PORT') is None:
         os.environ['MASTER_PORT'] = '3630'
 
-    os.system(f'fuser -n tcp -k {os.getenv("MASTER_PORT")}')
     # initialize the process group
     dist.init_process_group('nccl', rank=rank, world_size=world_size)
 
@@ -43,6 +42,7 @@ def setup_and_run_single_process_train_code(local_rank, node_rank, gpus_per_node
     try:
         train_loop(local_rank=local_rank, global_rank=global_rank, **train_loop_kwargs)
     finally:
+        os.system(f'fuser -n tcp -k {os.getenv("MASTER_PORT")}')
         cleanup()
 
 def spawn_processes_for_this_node(setup_and_run_single_process_train_code, gpus_per_node, node_rank, world_size,

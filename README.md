@@ -29,3 +29,6 @@ To run this program you can use the following command
 ## Known problems and fixes
 1. To get way more info on what NCCL is doing set the following env. vars `NCCL_DEBUG=INFO NCCL_DEBUG_SUBSYS=ALL`
 2. `NCCL WARN Call to ibv_create_cq failed with error Cannot allocate memory` - It is likely that `ulimit -l` is set too low
+
+## Things to be double checked
+1. do we need `has100GbE =?= true` - this condor flag?
