@@ -2,11 +2,11 @@ import torch
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.optim as optim
 
-
 from model.toy_model import ToyModel
 
-def run_training_loop(local_rank, global_rnak):
+def run_training_loop(local_rank, global_rnak, **kwargs):
     # create model and move it to GPU with id rank
+    # print(kwargs)
     model = ToyModel().to(local_rank)
     ddp_model = DDP(model)
 
