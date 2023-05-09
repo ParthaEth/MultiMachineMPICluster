@@ -1,5 +1,4 @@
 import os
-import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
 
@@ -67,9 +66,9 @@ def manage_master_node_addr_and_port(node_rank, out_dir, unique_id):
 
         os.environ['MASTER_ADDR'] = ipaddr
 
-def manage_com_run_train_loop(node_rank, output_dir, unique_id, gpu_per_node, nodes, train_loop):
+def manage_com_run_train_loop(node_rank, output_dir, unique_id, gpu_per_node, nodes, train_loop, **train_loop_kwargs):
     manage_master_node_addr_and_port(node_rank, output_dir, unique_id=unique_id)
     world_size = gpu_per_node * nodes
     spawn_processes_for_this_node(setup_and_run_single_process_train_code, gpu_per_node, node_rank,
-                                  world_size, train_loop, out_dir=output_dir)
+                                  world_size, train_loop, **train_loop_kwargs)
 

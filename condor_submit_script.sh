@@ -28,15 +28,18 @@ while [ $# -gt 0 ]; do
     --cuda_device_name=*)
       cuda_device_name="${1#*=}"
       ;;
+    --path_top_py_scpt=*)
+      path_top_py_scpt="${1#*=}"
+      ;;
     *)
-      printf "***************************\n"
+      printf "****************************\n"
       printf "* Error: Invalid argument. $1 *\n"
-      printf "***************************\n"
+      printf "****************************\n"
       exit 1
   esac
   shift
 done
 
-command="condor_submit_bid $bid <(printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' 'error=$output_dir/\$(Process).\$(Cluster).err' 'output=$output_dir/\$(Process).\$(Cluster).out' 'log=$output_dir/\$(Process).\$(Cluster).log' 'request_cpus=$num_cpus_per_node' 'request_gpus=$num_gpus_per_node' 'request_memory=$cpu_ram_MB' 'requirements=CUDADeviceName==\"$cuda_device_name\"' 'executable=$python_interp_path' 'arguments=main.py --gpu_per_node $num_gpus_per_node --nodes $nodes --node_rank \$(Process) --output_dir $output_dir --unique_id \$(Cluster)' 'queue $nodes')"
+command="condor_submit_bid $bid <(printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' 'error=$output_dir/\$(Cluster)_\$(Process).err' 'output=$output_dir/\$(Cluster)_\$(Process).out' 'log=$output_dir/\$(Cluster)_\$(Process).log' 'request_cpus=$num_cpus_per_node' 'request_gpus=$num_gpus_per_node' 'request_memory=$cpu_ram_MB' 'requirements=CUDADeviceName==\"$cuda_device_name\"' 'executable=$python_interp_path' 'arguments=$path_top_py_scpt --gpu_per_node $num_gpus_per_node --nodes $nodes --node_rank \$(Process) --output_dir $output_dir --unique_id \$(Cluster)' 'queue $nodes')"
 eval "$command"
 
