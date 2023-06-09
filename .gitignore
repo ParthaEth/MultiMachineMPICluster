@@ -3,3 +3,4 @@
 examples/model/__pycache__/
 examples/training/__pycache__/
 *__pycache__/
+*~

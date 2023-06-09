@@ -1,0 +1,10 @@
+error=/tmp/$(Cluster)_$(Process).err
+output=/tmp/$(Cluster)_$(Process).out
+log=/tmp/$(Cluster)_$(Process).log
+request_cpus=2
+request_gpus=1
+request_memory=64000
+requirements=CUDADeviceName=="NVIDIA A100-SXM4-80GB"
+executable=/usr/bin/python
+arguments=./examples/main.py --gpu_per_node 1 --nodes 2 --node_rank $(Process) --output_dir /tmp --unique_id $(Cluster)
+queue 2
